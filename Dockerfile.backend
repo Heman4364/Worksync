@@ -1,0 +1,16 @@
+# Build Stage
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
+WORKDIR /app
+COPY backend/pom.xml .
+RUN mvn dependency:go-offline -B
+COPY backend/src ./src
+RUN mvn clean package -DskipTests
+
+# Run Stage
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+VOLUME /tmp
+COPY --from=builder /app/target/worksync-backend-1.0.0.jar app.jar
+ENV SPRING_PROFILES_ACTIVE=prod
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]

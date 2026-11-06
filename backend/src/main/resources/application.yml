@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: worksync-backend
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{correlationId}] %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.worksync: DEBUG
+    org.springframework.security: INFO
+    org.springframework.kafka: INFO

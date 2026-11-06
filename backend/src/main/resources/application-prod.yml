@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/worksync}
+    username: ${SPRING_DATASOURCE_USERNAME:worksync}
+    password: ${SPRING_DATASOURCE_PASSWORD:worksync123}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: reliability-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+worksync:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      access-token-expiration-ms: 900000
+      refresh-token-expiration-ms: 604800000
+    aes:
+      secret-key: ${AES_SECRET_KEY:d29ya3N5bmMtYWVzLTI1Ni1nY20ta2V5LXNlY3JldA==}
+  kafka:
+    topic:
+      scheduled-posts: scheduled-posts
+      scheduled-posts-dlt: scheduled-posts-dlt
+    retry:
+      max-attempts: 3
+      initial-interval-ms: 2000
+      multiplier: 2.0

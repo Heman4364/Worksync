@@ -1,16 +1,30 @@
 import axios from 'axios';
 
+export const getBaseApiUrl = () => {
+  const custom = typeof window !== 'undefined' ? localStorage.getItem('worksync_api_url') : null;
+  const raw = (custom || import.meta.env.VITE_API_URL || '').trim();
+  if (!raw || raw === '/') return '/api';
+  let clean = raw.replace(/\/+$/, '');
+  if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+    if (!clean.includes('.') && !clean.startsWith('/')) {
+      clean = `${clean}.onrender.com`;
+    }
+    clean = `https://${clean}`;
+  }
+  return `${clean.replace(/\/+$/, '')}/api`;
+};
+
 const api = axios.create({
-  baseURL: (() => {
-    const raw = (import.meta.env.VITE_API_URL || '').trim();
-    if (!raw) return '/api';
-    const clean = raw.replace(/\/+$/, '');
-    return clean.startsWith('http://') || clean.startsWith('https://') ? `${clean}/api` : `https://${clean}/api`;
-  })(),
+  baseURL: getBaseApiUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+});
+
+api.interceptors.request.use((config) => {
+  config.baseURL = getBaseApiUrl();
+  return config;
 });
 
 // Correlation ID generator

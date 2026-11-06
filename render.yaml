@@ -45,7 +45,7 @@ services:
         fromService:
           type: web
           name: worksync-backend
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
         source: /*

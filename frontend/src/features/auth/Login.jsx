@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser, clearAuthError } from '../../store/slices/authSlice';
 import { InteractiveMascot } from '../../components/InteractiveMascot';
 import { Button } from '../../components/Button';
-import { Mail, Lock, Shield, Briefcase, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Shield, Briefcase, User, ArrowRight, Eye, EyeOff, Server, Check } from 'lucide-react';
+import { getBaseApiUrl } from '../../services/api';
 import clsx from 'clsx';
 
 export const Login = () => {
@@ -20,6 +21,19 @@ export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+  const [showApiModal, setShowApiModal] = useState(false);
+  const [apiUrlInput, setApiUrlInput] = useState(() => localStorage.getItem('worksync_api_url') || '');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSaveApiUrl = () => {
+    if (apiUrlInput.trim()) {
+      localStorage.setItem('worksync_api_url', apiUrlInput.trim());
+    } else {
+      localStorage.removeItem('worksync_api_url');
+    }
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2500);
+  };
 
   const roleConfigs = {
     ADMIN: {

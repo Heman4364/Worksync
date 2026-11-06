@@ -2,7 +2,7 @@ services:
   # 1. Spring Boot Backend Web Service
   - type: web
     name: worksync-backend
-    env: docker
+    runtime: docker
     dockerfilePath: Dockerfile.backend
     plan: free
     region: oregon
@@ -10,17 +10,33 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: SPRING_DATASOURCE_URL
+      - key: DB_HOST
         fromDatabase:
           name: worksync-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: worksync-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: worksync-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: worksync-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: worksync-db
+          property: password
       - key: WORKSYNC_SECURITY_JWT_SECRET
         generateValue: true
 
   # 2. React Vite Frontend Static Site
   - type: web
     name: worksync-frontend
-    env: static
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist

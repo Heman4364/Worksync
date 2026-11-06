@@ -1,11 +1,8 @@
 spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/worksync}
-    username: ${SPRING_DATASOURCE_USERNAME:worksync}
-    password: ${SPRING_DATASOURCE_PASSWORD:worksync123}
-    driverClassName: org.postgresql.Driver
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: false

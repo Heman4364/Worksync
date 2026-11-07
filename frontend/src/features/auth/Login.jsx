@@ -21,6 +21,17 @@ export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+  const [isWaitingWakeup, setIsWaitingWakeup] = useState(false);
+
+  React.useEffect(() => {
+    let t;
+    if (loading) {
+      t = setTimeout(() => setIsWaitingWakeup(true), 3500);
+    } else {
+      setIsWaitingWakeup(false);
+    }
+    return () => clearTimeout(t);
+  }, [loading]);
   const [showApiModal, setShowApiModal] = useState(false);
   const [apiUrlInput, setApiUrlInput] = useState(() => localStorage.getItem('worksync_api_url') || '');
   const [saveSuccess, setSaveSuccess] = useState(false);

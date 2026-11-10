@@ -117,18 +117,26 @@ const kafkaSlice = createSlice({
   extraReducers: (builder) => {
     // Events
     builder.addCase(fetchKafkaEvents.fulfilled, (state, action) => {
-      state.events = action.payload;
+      state.events = Array.isArray(action.payload) ? action.payload : [];
     });
     builder.addCase(publishKafkaEvent.fulfilled, (state, action) => {
-      state.events.unshift(action.payload);
+      if (!action.payload) return;
+      const idx = state.events.findIndex(
+        (e) => e.id === action.payload.id || e.eventId === action.payload.eventId
+      );
+      if (idx !== -1) {
+        state.events[idx] = action.payload;
+      } else {
+        state.events.unshift(action.payload);
+      }
     });
 
     // DLQ
     builder.addCase(fetchDlqRecords.fulfilled, (state, action) => {
-      state.dlqRecords = action.payload;
+      state.dlqRecords = Array.isArray(action.payload) ? action.payload : [];
     });
     builder.addCase(retryDlqEvent.fulfilled, (state, action) => {
-      const idx = state.dlqRecords.findIndex((d) => d.eventId === action.payload.eventId);
+      const idx = state.dlqRecords.findIndex((d) => d.eventId === action.payload?.eventId);
       if (idx !== -1) {
         state.dlqRecords[idx].reprocessed = true;
       }
@@ -136,7 +144,7 @@ const kafkaSlice = createSlice({
 
     // Logs
     builder.addCase(fetchProcessingLogs.fulfilled, (state, action) => {
-      state.logs = action.payload;
+      state.logs = Array.isArray(action.payload) ? action.payload : [];
     });
     builder.addCase(clearProcessingLogs.fulfilled, (state) => {
       state.logs = [];

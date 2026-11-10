@@ -12,5 +12,6 @@ import java.util.Optional;
 public interface DeadLetterRecordRepository extends JpaRepository<DeadLetterRecord, Long> {
     Page<DeadLetterRecord> findAllByOrderByRoutedAtDesc(Pageable pageable);
     Optional<DeadLetterRecord> findByEventId(String eventId);
+    Optional<DeadLetterRecord> findFirstByEventIdOrderByRoutedAtDesc(String eventId);
     long countByReprocessedFalse();
 }

@@ -31,6 +31,7 @@ import {
   Trash2,
   Terminal,
   Activity,
+  Send,
 } from 'lucide-react';
 
 export const KafkaReliabilityDashboard = () => {
@@ -84,9 +85,14 @@ export const KafkaReliabilityDashboard = () => {
     );
 
     if (!res.error) {
-      dispatch(addToast({ title: 'Event Dispatched', message: `Event status: ${res.payload.status}`, type: 'success' }));
+      const status = res.payload?.status || 'DISPATCHED';
+      const toastType = status === 'DLQ' ? 'warning' : status === 'DUPLICATE_IGNORED' ? 'info' : 'success';
+      dispatch(addToast({ title: 'Event Dispatched', message: `Event [${res.payload?.eventId}] status: ${status}`, type: toastType }));
+      dispatch(fetchKafkaEvents());
       dispatch(fetchProcessingLogs());
       dispatch(fetchDlqRecords());
+    } else {
+      dispatch(addToast({ title: 'Dispatch Failed', message: res.payload || 'Failed to publish event to Kafka', type: 'error' }));
     }
   };
 
@@ -97,6 +103,8 @@ export const KafkaReliabilityDashboard = () => {
       dispatch(fetchDlqRecords());
       dispatch(fetchProcessingLogs());
       dispatch(fetchKafkaEvents());
+    } else {
+      dispatch(addToast({ title: 'Reprocess Failed', message: res.payload || 'Failed to reprocess DLQ event', type: 'error' }));
     }
   };
 
@@ -107,6 +115,8 @@ export const KafkaReliabilityDashboard = () => {
       dispatch(fetchProcessingLogs());
       dispatch(fetchKafkaEvents());
       dispatch(fetchDlqRecords());
+    } else {
+      dispatch(addToast({ title: 'Test Run Failed', message: res.payload || 'Failed to execute Kafka reliability tests', type: 'error' }));
     }
   };
 
@@ -121,6 +131,8 @@ export const KafkaReliabilityDashboard = () => {
     );
     if (!res.error) {
       dispatch(addToast({ title: 'Config Updated', message: 'Kafka exponential backoff parameters updated', type: 'success' }));
+    } else {
+      dispatch(addToast({ title: 'Config Update Failed', message: res.payload || 'Failed to update retry settings', type: 'error' }));
     }
   };
 

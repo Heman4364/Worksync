@@ -147,7 +147,7 @@ public class KafkaReliabilityEngine {
                     "PROCESSING"
             ));
 
-            if ("SUCCESS".equalsIgnoreCase(mode) || "NONE".equalsIgnoreCase(mode)) {
+            if ("SUCCESS".equalsIgnoreCase(mode) || "NONE".equalsIgnoreCase(mode) || "DUPLICATE".equalsIgnoreCase(mode)) {
                 success = true;
                 record.setStatus("COMPLETED");
                 record.setFailureReason(null);
@@ -245,7 +245,7 @@ public class KafkaReliabilityEngine {
         KafkaEventRecord record = eventRecordRepository.findByEventId(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with eventId: " + eventId));
 
-        DeadLetterRecord dlq = dlqRepository.findByEventId(eventId)
+        DeadLetterRecord dlq = dlqRepository.findFirstByEventIdOrderByRoutedAtDesc(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("DLQ record not found for eventId: " + eventId));
 
         log.info("Safe DLQ reprocessing triggered for event [{}] (Original eventId retained)", eventId);
